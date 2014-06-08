@@ -27,9 +27,9 @@ public interface EventRepository {
     List<User> getParticipants(int eventId)
                     throws EmptyResultDataAccessException, EventNotExistsException;
 
-    List<Event> getAllEventsForUser(String username);
+    List<Event> getAllEventsForUser(Integer userId);
 
-    boolean deleteUserFromEvent(String username, int eventId);
+    boolean deleteUserFromEvent(Integer userId, int eventId);
 
     List<Event> getEventDetail(Integer id) throws EventNotExistsException;
 }

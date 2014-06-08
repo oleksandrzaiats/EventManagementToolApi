@@ -1,28 +1,26 @@
 package com.zayats.dal;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
+import com.zayats.controller.UserController;
+import com.zayats.rowmapper.InvitationsRowMapper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import com.zayats.controller.UserController;
-import com.zayats.rowmapper.InvitationsRowMapper;
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JDBCInvitationRepository implements InvitationRepository {
 
-	public final String CREATE_INVITATION_STRING = "INSERT INTO invitations(username_from, username_to, family_id) VALUES (:fromUsername, :toUsername, :familyId)";
-	public final String GET_INVITATION_ID = "SELECT invitation_id FROM invitations WHERE username_from = :fromUsername AND username_to = :toUsername AND family_id = :familyId";
+	public final String CREATE_INVITATION_STRING = "INSERT INTO invitations(username_from, username_to, event_id) VALUES (:fromUsername, :toUsername, :eventId)";
+	public final String GET_INVITATION_ID = "SELECT invitation_id FROM invitations WHERE username_from = :fromUsername AND username_to = :toUsername AND event_id = :eventId";
 	public final String DELETE_INVITATION_STRING = "DELETE FROM invitations WHERE invitation_id = :invitationId";
-	public final String GET_USER_INVITSTIONS_STRING = "SELECT b.first_name, b.last_name, families.family_id, invitations.invitation_id, families.name, invitations.username_from " +
-			"FROM users a, users b, invitations, families " +
+	public final String GET_USER_INVITSTIONS_STRING = "SELECT b.first_name, b.last_name, events.id, invitations.invitation_id, events.name, invitations.username_from " +
+			"FROM users a, users b, invitations, events " +
 			"WHERE username_to = :toUsername " +
-				"AND families.family_id = invitations.family_id " +
+				"AND events.id = invitations.event_id " +
 				"AND username_to = a.username " + 
 				"AND username_from = b.username";
 	
@@ -39,15 +37,15 @@ public class JDBCInvitationRepository implements InvitationRepository {
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 
-	public boolean createInvitation(int familyId, String fromUsername,
+	public boolean createInvitation(int eventId, String fromUsername,
 			String toUsername) {
-		boolean created = checkInvitation(familyId, fromUsername, toUsername);
+		boolean created = checkInvitation(eventId, fromUsername, toUsername);
 		if (created) {
 			return false;
 		}
 		
 		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("familyId", familyId);
+		parameters.put("eventId", eventId);
 		parameters.put("fromUsername", fromUsername);
 		parameters.put("toUsername", toUsername);
 		logger.info("Inserting invitation: " + parameters);
@@ -70,10 +68,10 @@ public class JDBCInvitationRepository implements InvitationRepository {
 	/**
 	 * True if invitation exists, false in opposite way
 	 */
-	private boolean checkInvitation(int familyId, String fromUsername,
+	private boolean checkInvitation(int eventId, String fromUsername,
 			String toUsername) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("familyId", familyId);
+		parameters.put("eventId", eventId);
 		parameters.put("fromUsername", fromUsername);
 		parameters.put("toUsername", toUsername);
 		int res = -1;

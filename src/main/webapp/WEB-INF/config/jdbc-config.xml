@@ -25,7 +25,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
-	<bean id="jdbcShoplistTemplate" class="com.zayats.dal.JDBCShoplistRepository">
+	<bean id="jdbcShoplistTemplate" class="com.zayats.dal.JDBCTaskRepository">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	

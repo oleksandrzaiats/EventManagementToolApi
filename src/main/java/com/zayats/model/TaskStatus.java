@@ -1,5 +1,5 @@
 package com.zayats.model;
 
-public enum ItemStatus {
+public enum TaskStatus {
     OPEN, IN_PROGRESS, DONE;
 }

@@ -29,11 +29,11 @@ public class UsersController {
 	@Autowired
 	InvitationRepository invitationRepository;
 
-	@RequestMapping(value = "/delete/{username}/{familyId}")
-	public @ResponseBody List<Boolean> deleteUserFromFamily(@PathVariable String username,
+	@RequestMapping(value = "/delete/{userId}/{familyId}")
+	public @ResponseBody List<Boolean> deleteUserFromFamily(@PathVariable Integer userId,
 			@PathVariable int familyId, Model model, Principal principal) {
 		List<Boolean> result = new ArrayList<Boolean>();
-		result.add(eventRepository.deleteUserFromEvent(username, familyId));
+		result.add(eventRepository.deleteUserFromEvent(userId, familyId));
 
 		return result;
 	}
@@ -47,11 +47,11 @@ public class UsersController {
 		return result;
 	}
 
-	@RequestMapping(value = "/{userString}/{familyId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{userString}/{eventId}", method = RequestMethod.GET)
 	public @ResponseBody
 	List<User> searchUsers(@PathVariable String userString,
-			@PathVariable int familyId, Model model, Principal principal) {
-		return userRepository.searchUsers(userString, familyId);
+			@PathVariable int eventId, Model model, Principal principal) {
+		return userRepository.searchUsers(userString, eventId);
 	}
 
 }

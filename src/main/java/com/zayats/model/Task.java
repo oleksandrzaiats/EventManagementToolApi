@@ -1,36 +1,91 @@
 package com.zayats.model;
 
-public class Task {
+import java.io.Serializable;
+import java.util.Date;
+
+public class Task implements Serializable {
 
 	private int id;
 	private String name;
-	private String quantity;
-	private ItemStatus status;
-    private User responsible;
+	private TaskStatus status;
     private String description;
+    private Date createDate;
+    private Date dueDate;
+    private Date doneDate;
+    private int eventId;
+    private User responsible;
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getQuantity() {
-		return quantity;
-	}
+    public TaskStatus getStatus() {
+        return status;
+    }
 
-	public void setQuantity(String quantity) {
-		this.quantity = quantity;
-	}
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Date getDoneDate() {
+        return doneDate;
+    }
+
+    public void setDoneDate(Date doneDate) {
+        this.doneDate = doneDate;
+    }
+
+    public int getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
+
+    public User getResponsible() {
+        return responsible;
+    }
+
+    public void setResponsible(User responsible) {
+        this.responsible = responsible;
+    }
+
 
 }

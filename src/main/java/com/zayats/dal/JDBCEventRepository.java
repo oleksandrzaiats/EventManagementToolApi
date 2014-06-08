@@ -35,7 +35,7 @@ public class JDBCEventRepository implements EventRepository {
             " users.first_name," +
             " users.last_name," +
             " users.username" +
-            " FROM events, users WHERE events.owner_id=:id AND events.owner_id=users.user_id";
+            " FROM events, users, users2events WHERE users2events.user_id=:id AND users2events.event_id=events.id AND users.user_id=users2events.user_id";
     private static final String GET_EVENT_DETAIL = "SELECT events.id," +
             " events.name," +
             " events.description," +
@@ -48,14 +48,15 @@ public class JDBCEventRepository implements EventRepository {
             " FROM events, users WHERE events.id=:id AND events.owner_id=users.user_id";
 	private static final String ASSIGN_EVENT_FOR_USER_STRING = "INSERT INTO users2events(user_id, event_id) VALUES(:user_id, :event_id)";
 	private static final String GET_EVENT_ID_STRING = "SELECT id FROM events WHERE name=:name AND owner_id=:id";
-	private static final String GET_ALL_EVENTS_FOR_USER_STRING = "SELECT events.event_id, events.name, events.username "
-			+ "FROM events,users2events "
-			+ "WHERE users2events.username=:username "
-			+ "AND events.event_id = users2events.event_id";
+	private static final String GET_ALL_EVENTS_FOR_USER_STRING = "SELECT events.*, users.* "
+			+ "FROM events,users2events, users "
+			+ "WHERE users2events.user_id=:userId "
+            + "AND users.user_id=:userId "
+			+ "AND events.id = users2events.event_id";
 	private static final String DELETE_EVENT_STRING = "DELETE FROM events WHERE id=:eventId";
-	private static final String GET_PARTICIPANTS_STRING = "SELECT * FROM users WHERE users.username IN (SELECT users2events.username FROM users2events WHERE event_id=:eventId)";
+	private static final String GET_PARTICIPANTS_STRING = "SELECT * FROM users WHERE users.user_id IN (SELECT users2events.user_id FROM users2events WHERE event_id=:eventId)";
 	private static final String GET_EVENT_STRING = "SELECT name FROM events WHERE event_id=:eventId";
-	private static final String DELETE_USER_FROM_EVENT_STRING = "DELETE FROM users2events WHERE event_id = :eventId AND username = :username";
+	private static final String DELETE_USER_FROM_EVENT_STRING = "DELETE FROM users2events WHERE event_id = :eventId AND user_id = :userId";
 
 	private static final Logger logger = Logger.getLogger(UserController.class);
 
@@ -167,13 +168,6 @@ public class JDBCEventRepository implements EventRepository {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("eventId", eventId);
 
-		try {
-			jdbcTemplate.queryForObject(GET_EVENT_STRING, parameters,
-					String.class);
-		} catch (EmptyResultDataAccessException e) {
-			 new EventNotExistsException();
-		}
-
 		List<User> users = null;
 		logger.info("Get participant for event:" + eventId + ".");
 		users = jdbcTemplate.query(GET_PARTICIPANTS_STRING, parameters,
@@ -182,27 +176,27 @@ public class JDBCEventRepository implements EventRepository {
 	}
 
 	@Override
-    public List<Event> getAllEventsForUser(String username) {
+    public List<Event> getAllEventsForUser(Integer userId) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("username", username);
+		parameters.put("userId", userId);
 
 		List<Event> events = null;
-		logger.info("Get all events for user:" + username + ".");
+		logger.info("Get all events for user:" + userId + ".");
 		try {
 			events = jdbcTemplate.query(GET_ALL_EVENTS_FOR_USER_STRING,
 					parameters, new EventsRowMapper());
 		} catch (EmptyResultDataAccessException e) {
-			logger.info("User:" + username + " has no events.");
+			logger.info("User:" + userId + " has no events.");
 			return null;
 		}
 		return events;
 	}
 
 	@Override
-    public boolean deleteUserFromEvent(String username, int eventId) {
+    public boolean deleteUserFromEvent(Integer userId, int eventId) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("eventId", eventId);
-		parameters.put("username", username);
+		parameters.put("userId", userId);
 
 		jdbcTemplate.update(DELETE_USER_FROM_EVENT_STRING, parameters);
 

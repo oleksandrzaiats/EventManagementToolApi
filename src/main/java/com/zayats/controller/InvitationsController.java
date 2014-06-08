@@ -36,31 +36,31 @@ public class InvitationsController {
 		return list;
 	}
 
-	@RequestMapping(value = "/invite/{familyId}/{fromUsername}/{toUsername}", method = RequestMethod.GET)
+	@RequestMapping(value = "/invite/{eventId}/{fromUsername}/{toUsername}", method = RequestMethod.GET)
 	public @ResponseBody
 	List<Boolean> inviteUser(@PathVariable String toUsername,
-			@PathVariable int familyId, @PathVariable String fromUsername,
+			@PathVariable int eventId, @PathVariable String fromUsername,
 			Model model, Principal principal) {
-		boolean isInvited = invitationRepository.createInvitation(familyId,
+		boolean isInvited = invitationRepository.createInvitation(eventId,
 				fromUsername, toUsername);
 		List<Boolean> result = new ArrayList<Boolean>();
 		result.add(isInvited);
 		return result;
 	}
 
-	@RequestMapping(value = "/accept/{familyId}/{invitationId}/{username}", method = RequestMethod.GET)
+	@RequestMapping(value = "/accept/{eventId}/{invitationId}/{userId}", method = RequestMethod.GET)
 	public @ResponseBody
-	List<Boolean> acceptInvitation(@PathVariable int familyId,
-			@PathVariable int invitationId, @PathVariable Integer username, Model model, Principal principal) {
+	List<Boolean> acceptInvitation(@PathVariable int eventId,
+			@PathVariable int invitationId, @PathVariable Integer userId, Model model, Principal principal) {
 		invitationRepository.deleteInvitation(invitationId);
 		List<Boolean> result = new ArrayList<Boolean>();
-		result.add(eventRepository.assignEventToUser(familyId, username));
+		result.add(eventRepository.assignEventToUser(eventId, userId));
 		return result;
 	}
 	
-	@RequestMapping(value = "/decine/{invitationId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/reject/{invitationId}", method = RequestMethod.GET)
 	public @ResponseBody
-	List<Boolean> decineInvitation(@PathVariable int invitationId, Model model, Principal principal) {
+	List<Boolean> rejectInvitation(@PathVariable int invitationId, Model model, Principal principal) {
 		List<Boolean> result = new ArrayList<Boolean>();
 		result.add(invitationRepository.deleteInvitation(invitationId));
 

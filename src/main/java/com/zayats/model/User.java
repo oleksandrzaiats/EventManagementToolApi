@@ -1,5 +1,7 @@
 package com.zayats.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -18,7 +20,7 @@ public class User {
 	private String firstName;
 
 	private String lastName;
-
+    @JsonIgnore
 	private String role;
 
 	public User() {

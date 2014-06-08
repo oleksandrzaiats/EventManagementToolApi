@@ -41,8 +41,8 @@ public class EventsController {
         return list;
     }
 	
-	@RequestMapping(value = "/{eventId}/{username}")
-	public @ResponseBody List<User> eventManager(@PathVariable String eventId, @PathVariable String username, Model model,
+	@RequestMapping(value = "/users/{eventId}")
+	public @ResponseBody List<User> eventManager(@PathVariable String eventId, Model model,
 			Principal principal) {
 		List<User> list = null;
 		try {
