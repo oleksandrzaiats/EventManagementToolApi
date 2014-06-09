@@ -23,7 +23,7 @@ public class JDBCTaskRepository implements TaskRepository {
             "eventid) VALUES (:name, :description, :createDate, :dueDate, :userId, :status, :eventId)";
 	private final String DELETE_TASK_STRING = "DELETE FROM tasks WHERE id=:taskId";
 	private final String GET_TASKS_STRING = "SELECT tasks.*, users.* FROM tasks, users WHERE tasks.eventId=:eventId AND users.user_id=tasks.userid";
-	private final String GET_MOST_PRODUCTIVE = "SELECT DISTINCT us.first_name, us.last_name, (SELECT count(*) FROM tasks WHERE userid=us.user_id AND status='DONE') as amount FROM tasks, users us";
+	private final String GET_MOST_PRODUCTIVE = "SELECT DISTINCT us.first_name, us.last_name, (SELECT count(*) FROM tasks WHERE userid=us.user_id AND status='DONE' AND eventid=:eventId) as amount FROM tasks, users us";
 	private final String GET_TASKS_FOR_USER_STRING = "SELECT tasks.*, users.* FROM tasks, users WHERE tasks.eventId=:eventId AND tasks.userid=:userId AND users.user_id=tasks.userid";
 	private final String EDIT_TASK = "UPDATE tasks SET status=:status, userid=:responsible WHERE tasks.id=:taskId";
 	private final String GET_TASK_DETAIL = "SELECT tasks.*, users.* FROM tasks, users WHERE tasks.id=:taskId AND users.user_id=tasks.userid";
