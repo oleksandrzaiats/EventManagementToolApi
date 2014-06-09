@@ -80,9 +80,9 @@ public class TasksController {
     @RequestMapping(value = "/chart/{eventId}", method = RequestMethod.GET)
     public
     @ResponseBody
-    HashMap<String, Integer> getChartData(@PathVariable int eventId) {
+    HashMap<String, Object> getChartData(@PathVariable int eventId) {
 
-        HashMap<String, Integer> result = taskRepository
+        HashMap<String, Object> result = taskRepository
                 .getChartData(eventId);
 
         return result;

@@ -3,15 +3,14 @@ package com.zayats.dal;
 import com.zayats.controller.UserController;
 import com.zayats.model.Task;
 import com.zayats.model.TaskStatus;
+import com.zayats.rowmapper.ProductiveRowMapper;
 import com.zayats.rowmapper.TasksRowMapper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JDBCTaskRepository implements TaskRepository {
 
@@ -24,6 +23,7 @@ public class JDBCTaskRepository implements TaskRepository {
             "eventid) VALUES (:name, :description, :createDate, :dueDate, :userId, :status, :eventId)";
 	private final String DELETE_TASK_STRING = "DELETE FROM tasks WHERE id=:taskId";
 	private final String GET_TASKS_STRING = "SELECT tasks.*, users.* FROM tasks, users WHERE tasks.eventId=:eventId AND users.user_id=tasks.userid";
+	private final String GET_MOST_PRODUCTIVE = "SELECT DISTINCT us.first_name, us.last_name, (SELECT count(*) FROM tasks WHERE userid=us.user_id AND status='DONE') as amount FROM tasks, users us";
 	private final String GET_TASKS_FOR_USER_STRING = "SELECT tasks.*, users.* FROM tasks, users WHERE tasks.eventId=:eventId AND tasks.userid=:userId AND users.user_id=tasks.userid";
 	private final String EDIT_TASK = "UPDATE tasks SET status=:status, userid=:responsible WHERE tasks.id=:taskId";
 	private final String GET_TASK_DETAIL = "SELECT tasks.*, users.* FROM tasks, users WHERE tasks.id=:taskId AND users.user_id=tasks.userid";
@@ -61,8 +61,8 @@ public class JDBCTaskRepository implements TaskRepository {
 	}*/
 
     @Override
-    public HashMap<String, Integer> getChartData(int eventId) {
-        HashMap<String, Integer> result = new HashMap<String, Integer>();
+    public HashMap<String, Object> getChartData(int eventId) {
+        HashMap<String, Object> result = new HashMap<String, Object>();
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("eventId", eventId);
         List<Task> tasks;
@@ -93,6 +93,15 @@ public class JDBCTaskRepository implements TaskRepository {
             result.put(TaskStatus.IN_PROGRESS.name(), progress);
             result.put(TaskStatus.OPEN.name(), newTasks);
         }
+        List<Map.Entry<String, Integer>> users = jdbcTemplate.query(GET_MOST_PRODUCTIVE,
+                parameters, new ProductiveRowMapper());
+        Collections.sort(users, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                return o2.getValue() - o1.getValue();
+            }
+        });
+        result.put("users", users);
         return result;
     }
 

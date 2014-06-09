@@ -9,7 +9,7 @@ public interface TaskRepository {
 
 	public boolean deleteTask(int listId);
 
-    HashMap<String,Integer> getChartData(int eventId);
+    HashMap<String,Object> getChartData(int eventId);
 
     List<Task> getTasksForEvent(int eventId);
 
