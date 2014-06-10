@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
 
 public interface EventRepository {
@@ -32,4 +33,6 @@ public interface EventRepository {
     boolean deleteUserFromEvent(Integer userId, int eventId);
 
     List<Event> getEventDetail(Integer id) throws EventNotExistsException;
+
+    List<HashMap<String, Object>> getDashboardDataForUser(Integer userId);
 }

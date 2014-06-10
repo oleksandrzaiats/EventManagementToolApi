@@ -17,10 +17,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JDBCEventRepository implements EventRepository {
 
@@ -56,6 +55,8 @@ public class JDBCEventRepository implements EventRepository {
 	private static final String DELETE_EVENT_STRING = "DELETE FROM events WHERE id=:eventId";
 	private static final String GET_PARTICIPANTS_STRING = "SELECT * FROM users WHERE users.user_id IN (SELECT users2events.user_id FROM users2events WHERE event_id=:eventId)";
 	private static final String GET_EVENT_STRING = "SELECT name FROM events WHERE event_id=:eventId";
+	private static final String GET_EVENT_TASKS_COUNT = "SELECT COUNT(*) FROM tasks WHERE eventid=:eventId";
+	private static final String GET_EVENT_DONE_TASKS_COUNT = "SELECT COUNT(*) FROM tasks WHERE eventid=:eventId AND status='DONE'";
 	private static final String DELETE_USER_FROM_EVENT_STRING = "DELETE FROM users2events WHERE event_id = :eventId AND user_id = :userId";
 
 	private static final Logger logger = Logger.getLogger(UserController.class);
@@ -202,4 +203,57 @@ public class JDBCEventRepository implements EventRepository {
 
 		return true;
 	}
+
+    @Override
+    public List<HashMap<String, Object>> getDashboardDataForUser(Integer userId) {
+        List<HashMap<String, Object>> result = new LinkedList<HashMap<String, Object>>();
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("userId", userId);
+
+        List<Event> events = null;
+        logger.info("Get all events for user:" + userId + ".");
+        try {
+            events = jdbcTemplate.query(GET_ALL_EVENTS_FOR_USER_STRING,
+                    parameters, new EventsRowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            logger.info("User:" + userId + " has no events.");
+            return null;
+        }
+        if(events != null && events.size() !=  0) {
+            Collections.sort(events, new Comparator<Event>() {
+                @Override
+                public int compare(Event o1, Event o2) {
+                    long diff = o2.getDate().getTime() - o1.getDate().getTime();
+                    if(diff > 0) {
+                        return 1;
+                    } else if(diff == 0) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+            for (Event event : events) {
+                HashMap<String, Object> eventsProgress = new HashMap<String, Object>();
+                Map<String, Object> eventParameters = new HashMap<String, Object>();
+                eventParameters.put("eventId", event.getId());
+                Integer count = jdbcTemplate.queryForInt(GET_EVENT_TASKS_COUNT, eventParameters);
+                Integer done = jdbcTemplate.queryForInt(GET_EVENT_DONE_TASKS_COUNT, eventParameters);
+                BigDecimal decimal = BigDecimal.ZERO;
+                if(count != null && count != 0 && done != null && done != 0) {
+                    decimal = new BigDecimal((100. / count) * done);
+                }
+                eventsProgress.put("name", event.getName());
+                eventsProgress.put("id", event.getId());
+                eventsProgress.put("progress", decimal.setScale(0).intValue());
+                eventsProgress.put("date", event.getDate());
+                result.add(eventsProgress);
+            }
+
+
+            return result;
+        } else {
+            return null;
+        }
+    }
 }
