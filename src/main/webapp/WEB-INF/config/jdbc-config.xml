@@ -14,8 +14,8 @@
 	</bean>
 
 	<bean class="java.net.URI" id="dbUrl">
-		<constructor-arg value="postgres://fhifjeyudoivla:oRygs_ulKX8NSsMELGC2zyt5Qq@ec2-54-247-178-60.eu-west-1.compute.amazonaws.com:5432/dbi9qvoue83j1g" />
-	</bean>
+		<constructor-arg value="postgresql://admindd2tyiy:IzFPu5s52YDz@5479f5e24382ec2a95000148-zayats.rhcloud.com:57641/" />
+</bean>
 
 	<bean id="jdbcUserTemplate" class="com.zayats.dal.JDBCUserRepository">
 		<property name="dataSource" ref="dataSource" />
