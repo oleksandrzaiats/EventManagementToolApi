@@ -26,8 +26,8 @@ public class JDBCUserRepository implements UserRepository {
 	private final String GET_USER_ID_STRING = "SELECT user_id from users where username=:username OR email=:username";
 	private final String SET_USER_ROLE_STRING = "INSERT INTO user_roles(user_id, authority) VALUES (:userId, :authority)";
 	private final String GET_USERS = "SELECT DISTINCT users.user_id, users.username, users.first_name, users.last_name, users.email " +
-			"FROM users, users2events WHERE users.username LIKE :userString OR users.first_name LIKE :userString OR users.last_name LIKE :userString " +
-			"AND users.username NOT IN (SELECT DISTINCT username FROM users2events WHERE event_id=:eventId)";
+			"FROM users, users2events WHERE (users.username LIKE :userString OR users.first_name LIKE :userString OR users.last_name LIKE :userString) " +
+			"AND users.user_id NOT IN (SELECT DISTINCT user_id FROM users2events WHERE event_id=:eventId)";
 	
 	private static final Logger logger = Logger.getLogger(UserController.class);
 
